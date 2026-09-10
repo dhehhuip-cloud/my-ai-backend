@@ -31,10 +31,10 @@ def read_root():
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
-        # Gemini 2.5 Flash 모델 호출
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=request.prompt
+response = client.models.generate_content(
+    model="gemini-3.6-flash",
+    contents=request.prompt
+)
         )
         return {"response": response.text}
     except Exception as e:
