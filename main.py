@@ -26,9 +26,9 @@ def read_root():
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
-        # 표준 무료 티어 지원 모델인 gemini-1.5-flash 로 변경
+        # 현재 정상 호출 가능한 gemini-2.0-flash 사용
         response = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.0-flash",
             contents=request.prompt
         )
         return {"response": response.text}
