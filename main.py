@@ -6,7 +6,6 @@ from google import genai
 
 app = FastAPI()
 
-# CORS 설정 (모든 도메인에서 접속 허용)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,8 +16,8 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     prompt: str
+    mode: str = "normal"  # normal 또는 concise
 
-# Render 환경변수 GEMINI_API_KEY 로드
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @app.get("/")
@@ -28,10 +27,14 @@ def read_root():
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
-        # gemini-3.6-flash 모델 호출
+        # 모드가 'concise'일 경우 프롬프트에 지시사항 추가
+        prompt_text = request.prompt
+        if request.mode == "concise":
+            prompt_text = f"[지시: 답변을 최대한 간결하고 요점만 짧게 핵심만 말해줘.]\n\n질문: {request.prompt}"
+
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=request.prompt
+            model="gemini-2.0-flash",
+            contents=prompt_text
         )
         return {"response": response.text}
     except Exception as e:
