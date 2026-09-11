@@ -28,21 +28,22 @@ def read_root():
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
     max_retries = 3
-    delay = 2
+    delay = 2  # 초 단위 대기 시간
 
     for attempt in range(max_retries):
         try:
-            # 3.6 라인업의 고성능 모델인 gemini-3.6-pro 적용
+            # 필수 지원 모델인 gemini-3.6-flash 사용
             response = client.models.generate_content(
-                model="gemini-3.6-pro",
+                model="gemini-3.6-flash",
                 contents=request.prompt
             )
             return {"response": response.text}
 
         except APIError as e:
+            # 429(할당량 초과) 발생 시 대기 후 재시도
             if e.code == 429 and attempt < max_retries - 1:
                 await asyncio.sleep(delay)
-                delay *= 2
+                delay *= 2  # 대기 시간 2배 증가 (지수 백오프)
                 continue
             return {"response": f"[서버 에러] {str(e)}"}
             
