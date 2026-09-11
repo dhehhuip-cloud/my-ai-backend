@@ -43,7 +43,7 @@
         const loadingEl = appendMessage('assistant', '생성 중...');
 
         try {
-            const res = await fetch('https://my-ai-backend-2kqk.onrender.com/api/chat', {
+            const res = await fetch('https://my-ai-backend-2kqk.onrender.com/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: text })
