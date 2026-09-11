@@ -32,9 +32,9 @@ async def chat_endpoint(request: ChatRequest):
 
     for attempt in range(max_retries):
         try:
-            # 필수 지원 모델인 gemini-3.6-flash 사용
+            # 필수 지원 모델인 gemini-3.5-flash-Lite 사용
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model="gemini-3.5-flash-Lite",
                 contents=request.prompt
             )
             return {"response": response.text}
