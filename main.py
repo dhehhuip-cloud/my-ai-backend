@@ -1,8 +1,10 @@
 import os
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
+from google.genai.errors import APIError
 
 app = FastAPI()
 
@@ -25,12 +27,24 @@ def read_root():
 
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
-    try:
-        # 현재 정상 호출 가능한 gemini-2.0-flash 사용
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=request.prompt
-        )
-        return {"response": response.text}
-    except Exception as e:
-        return {"response": f"[서버 에러] {str(e)}"}
+    max_retries = 3
+    delay = 2
+
+    for attempt in range(max_retries):
+        try:
+            # 3.6 라인업의 고성능 모델인 gemini-3.6-pro 적용
+            response = client.models.generate_content(
+                model="gemini-3.6-pro",
+                contents=request.prompt
+            )
+            return {"response": response.text}
+
+        except APIError as e:
+            if e.code == 429 and attempt < max_retries - 1:
+                await asyncio.sleep(delay)
+                delay *= 2
+                continue
+            return {"response": f"[서버 에러] {str(e)}"}
+            
+        except Exception as e:
+            return {"response": f"[서버 에러] {str(e)}"}
