@@ -26,9 +26,9 @@ def read_root():
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
-        # 모델명을 gemini-3.6-flash 로 업데이트
+        # 올바른 모델명인 gemini-2.5-flash 로 변경
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="gemini-2.5-flash",
             contents=request.prompt
         )
         return {"response": response.text}
